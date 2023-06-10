@@ -5,6 +5,7 @@
 
 /* Headers for the string routines */
 #include "JsStr.h"
+#include <unistd.h>
 
 /* js_octets: Number of allowed octets in a given string
    input: Pointer to the string in question

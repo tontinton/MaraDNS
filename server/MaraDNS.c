@@ -206,6 +206,7 @@ void debug_show_ip(uint32 ip) {
     }
 
 /* This displays ipv6 ips; thanks Remmy */
+#if 1
 
 #ifdef IPV6
 /* Cygwin doesn't have ipv6 yet */
@@ -263,7 +264,7 @@ void display_unfreed() {
    Input: Null-terminated string with the message to log
    Output: JS_SUCCESS on success, JS_ERROR on error
 */
-
+#endif
 int mlog(char *logmessage) {
 
     if(log_level == 0)
@@ -282,7 +283,7 @@ int mlog(char *logmessage) {
 
     return JS_SUCCESS;
     }
-
+#if 1
 /* Print out log messages of js_string messages
    Input: js_string object to log
    Output: JS_SUCCESS on success, JS_ERROR on error
@@ -306,7 +307,7 @@ int jlog(js_string *logmessage) {
 
     return ret;
     }
-
+#endif
 /* Print out log message of a Null-terminated string followed by a js_string
    Input: Null-terminated string, js_string
    Output: JS_SUCCESS on success, JS_ERROR on error */
@@ -328,12 +329,12 @@ int zjlog(char *left, js_string *right) {
 
     return ret;
     }
-
+#if 1
 /* Handler to handle fatal errors.
    Input: Pointer to null-terminalted string with fatal error
    Output: MaraDNS exits
 */
-
+#endif
 void harderror(char *why) {
     printf("%s%s%s",L_FATAL,why,L_N); /* "Fatal Error: ", why, "\n" */
 
@@ -342,7 +343,7 @@ void harderror(char *why) {
 
     exit(3);
     }
-
+#if 1
 /* Handler to handle system fatal errors.
    Input: Pointer to null-terminalted string with fatal error
    Output: MaraDNS exits
@@ -360,7 +361,7 @@ void sys_harderror(char *why) {
 
     exit(3);
     }
-
+#endif
 /* This function returns an appropriate RA (Recursion available) value.
  * If the user has not set "recursive_acl", this will always return 0.
  * If the argument give to this is 0, return zero.  Otherwise, return 1
@@ -376,7 +377,7 @@ int calc_ra_value(int want_ra) {
         return want_ra;
 #endif /* AUTHONLY */
 }
-
+#if 1
 /* This function prepares the notthere_ip string so that it we can quickly
  * make synthetic IPs.  Basically, the string is most of the DNS header and
  * data for the generated synthetic IP, in this form:
@@ -427,7 +428,7 @@ js_string *make_notthere_ip(js_string *ddip) {
         js_destroy(ip);
         return out;
 }
-
+#endif
 /* Calculate the TTL age given the expire time (absolute time) and
    the ttl (relative time)
    Input: Exprire time, TTL in question
@@ -453,7 +454,7 @@ uint32 determine_ttl(qual_timestamp expire,uint32 ttl) {
         }
     return min_visible_ttl;
     }
-
+#if 1
 /* Given a JS_STRING object with a DNS query (starting with the header)
  * in it, determine what the RD bit in that header is. */
 int get_header_rd(js_string *query) {
@@ -468,12 +469,13 @@ int get_header_rd(js_string *query) {
         }
         return *(query->string + 2) & 0x01;
 }
-
+#endif
 /* This function takes a conn *ect (a MaraDNS-specific description of a
  * connection that can be the IP and port of either a ipv4 or ipv6
  * connection), a socket number, and a js_string to send, and sends
  * a message over the 'net */
 int mara_send(conn *ect, int sock, js_string *reply) {
+    return JS_SUCCESS;
         if(ect == 0 || reply == 0) {
                 return JS_ERROR;
         }
@@ -494,7 +496,6 @@ int mara_send(conn *ect, int sock, js_string *reply) {
                 return JS_ERROR;
         }
 }
-
 /* Return a packet indicating that there was an error in the received
    packet
    input: socket number,
@@ -589,16 +590,17 @@ int udperror(int sock,js_string *raw, struct sockaddr_in *from,
        }
 
     /* Send them the reply */
-    if(ect == 0) {
-        sendto(sock,reply->string,reply->unit_count,0,
-            (struct sockaddr *)from,len_inet);
-    } else {
+    // if(ect == 0) {
+    //     sendto(sock,reply->string,reply->unit_count,0,
+    //         (struct sockaddr *)from,len_inet);
+    // } else {
         mara_send(ect,sock,reply);
-    }
+    // }
     js_destroy(reply);
     return JS_SUCCESS;
 
     }
+#if 1
 
 /* If we successfully found a record, add the answer to the A record,
    if applicable, add the NS data too, and add the appropriate
@@ -1105,12 +1107,12 @@ old_udpany_code_disabled:
 long_packet_ok:
 
     /* Success! Put out the good data */
-    if(ect == 0) {
-        sendto(sock,ar->string,ar->unit_count,0,
-            (struct sockaddr *)client,len_inet);
-    } else {
+    // if(ect == 0) {
+    //     sendto(sock,ar->string,ar->unit_count,0,
+    //         (struct sockaddr *)client,len_inet);
+    // } else {
         mara_send(ect,sock,ar);
-    }
+    // }
 
     js_destroy(ar);
     js_destroy(ns);
@@ -1577,12 +1579,12 @@ int udpstar(rr *where,int id,int sock,struct sockaddr_in *client,
         }
 
     /* Success! Put out the good data */
-    if(ect == 0) {
-        sendto(sock,ar->string,ar->unit_count,0,
-            (struct sockaddr *)client,len_inet);
-    } else {
+    // if(ect == 0) {
+    //     sendto(sock,ar->string,ar->unit_count,0,
+    //         (struct sockaddr *)client,len_inet);
+    // } else {
         mara_send(ect,sock,ar);
-    }
+    // }
 
     js_destroy(most);
     js_destroy(ar);
@@ -1636,12 +1638,12 @@ int make_notthere_reply(int id, int sock, struct sockaddr_in *client,
         js_append(notthere_ip,most);
 
         /* Send answer over UDP */
-        if(ect == 0) {
-                sendto(sock,most->string,most->unit_count,0,
-                        (struct sockaddr *)client,len_inet);
-        } else {
+        // if(ect == 0) {
+        //         sendto(sock,most->string,most->unit_count,0,
+        //                 (struct sockaddr *)client,len_inet);
+        // } else {
                 mara_send(ect,sock,most);
-        }
+        // }
 
         js_destroy(most);
         return JS_SUCCESS;
@@ -1892,12 +1894,12 @@ int udpnotfound(rr *where, int id, int sock, struct sockaddr_in *client,
         }
 
     /* Success! Put out the good data */
-    if(ect == 0) {
-        sendto(sock,compressed->string,compressed->unit_count,0,
-            (struct sockaddr *)client,len_inet);
-    } else {
+    // if(ect == 0) {
+    //     sendto(sock,compressed->string,compressed->unit_count,0,
+    //         (struct sockaddr *)client,len_inet);
+    // } else {
         mara_send(ect,sock,compressed);
-    }
+    // }
 
     js_destroy(most);
     js_destroy(compressed);
@@ -2317,7 +2319,7 @@ int ddip_check(int id, int sock, conn *ect, js_string *query) {
         return JS_ERROR;
 
     }
-
+#endif
 /* Determine if a given IP is on a given ipv4pair ACL
  * Input: The ip, the ACL list
  * Output: 0 if they do not have authority, 1 if they do
@@ -2335,7 +2337,7 @@ int check_ipv4_acl(uint32 ip, ipv4pair *list) {
         }
     return ret;
 }
-
+#if 1
 /* Determine if a given IP has authority to perform recursive DNS lookups
    Input: IP of where they come from
    Ouput: 0 if they do not have authority, 1 if they do
@@ -3689,7 +3691,7 @@ rr *init_ra_data() {
 
 /* The core of the DNS server */
 
-int main(int argc, char **argv) {
+int cmain(int argc, char **argv) {
 
     js_string *mararc_loc = 0, *errors = 0,
               *bind_address = 0, *ipv6_bind_address = 0,
@@ -4676,3 +4678,41 @@ int main(int argc, char **argv) {
 
     }
 
+#endif
+
+#include "stdio.h"
+
+int main(int argc, char **argv) {
+  js_string *incoming = 0;
+  js_string *uncomp = 0;
+  conn ect;
+
+  int len_inet = sizeof(struct sockaddr_in);
+  ect.addrlen = len_inet;
+
+  struct sockaddr_in *ipv4_client = js_alloc(1, sizeof(struct sockaddr_in));
+
+  ect.type = 4;
+  ect.d = ipv4_client;
+
+  incoming = js_create(768,1);
+  if(incoming == 0) {
+      harderror(L_IC); /* "Could not create incoming string" */
+  }
+  if(js_set_encode(incoming,MARA_LOCALE) == JS_ERROR) {
+      harderror(L_IL); /* "Could not set locale for incoming string" */
+  }
+
+  uncomp = js_create(768,1);
+  if(uncomp == 0) {
+      harderror(L_UCC); /* "Could not create uncomp string" */
+  }
+  if(js_set_encode(uncomp,MARA_LOCALE) == JS_ERROR) {
+      harderror(L_UCL); /* "Could not set locale for uncomp string" */
+  }
+
+  read(STDIN_FILENO, incoming->string, 512);
+
+  decompress_data(incoming, uncomp);
+  proc_query(uncomp, &ect, STDOUT_FILENO);
+}
