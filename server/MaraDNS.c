@@ -4690,10 +4690,20 @@ void run(int argc, char **argv, unsigned char *buf, int len) {
   int len_inet = sizeof(struct sockaddr_in);
   ect.addrlen = len_inet;
 
-  struct sockaddr_in *ipv4_client = js_alloc(1, sizeof(struct sockaddr_in));
+  struct sockaddr_in ipv4_client = {0};
+  ipv4_client.sin_port = htons(12345);
+  ipv4_client.sin_family = AF_INET;
+  ipv4_client.sin_addr.s_addr = 0x4e16d9ac;
 
   ect.type = 4;
-  ect.d = ipv4_client;
+  ect.d = &ipv4_client;
+
+  decomp_init(0);
+
+  bighash = mhash_create(8);
+  if(bighash == 0) {
+      harderror(L_NOBIGHASH); /* "Could not create big hash" */
+  }
 
   incoming = js_create(768,1);
   if(incoming == 0) {
